@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 import 'package:image/image.dart' as image_lib;
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -9,6 +11,7 @@ abstract class AiModel extends Equatable {
 
   final outputShapes = <List<int>>[];
   final outputTypes = <TfLiteType>[];
+  final outputDatas = <Uint8List>[];
 
   Interpreter? interpreter;
 
