@@ -37,8 +37,8 @@ class FaceMesh extends AiModel {
 
       final outputTensors = interpreter!.getOutputTensors();
 
-      print('호: ${outputTensors[1].numDimensions()}');
-      print('호: ${outputTensors[1].numElements()}');
+      // print('호: ${outputTensors[1].numDimensions()}');
+      // print('호: ${outputTensors[1].numElements()}');
 
       // for (int i = 0; i < 7; i++) {
       //   print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
@@ -47,10 +47,6 @@ class FaceMesh extends AiModel {
       //   print(
       //       '${outputTensors[i + 4].name} - $i: ${outputTensors[i + 4].data}');
       // }
-      var list = outputTensors[0].data;
-      Uint8List bytes = Uint8List.fromList(list);
-      String string = String.fromCharCodes(bytes);
-      // print('유닛: [${string}]]]');
       // print('ㅇㅇ: ${outputTensors.length}');
 
       outputTensors.forEach((tensor) {
@@ -113,7 +109,6 @@ class FaceMesh extends AiModel {
 
     interpreter!.runForMultipleInputs(inputs, outputs);
 
-    // print('##########');
     if (output1.getDoubleValue(0) < 0) {
       return null;
     }
@@ -122,12 +117,6 @@ class FaceMesh extends AiModel {
     final leftEyeLandmarkPoints = output2.getDoubleList().reshape([71, 2]);
 
     final landmarkResults = <Offset>[];
-    // var p = landmarkPoints[10];
-    // print('포인트 : [${p}]');
-    // landmarkResults.add(Offset(
-    //   p[0] / inputSize * image.width,
-    //   p[1] / inputSize * image.height,
-    // ));
 
     for (var point in lipsLandmarkPoints) {
       landmarkResults.add(Offset(
