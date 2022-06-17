@@ -114,7 +114,7 @@ class FaceMesh extends AiModel {
     }
 
     final lipsLandmarkPoints = output1.getDoubleList().reshape([80, 2]);
-    final leftEyeLandmarkPoints = output2.getDoubleList().reshape([71, 2]);
+    // final leftEyeLandmarkPoints = output2.getDoubleList().reshape([71, 2]);
 
     final landmarkResults = <Offset>[];
 
@@ -124,12 +124,12 @@ class FaceMesh extends AiModel {
         point[1] / inputSize * image.height,
       ));
     }
-    for (var point in leftEyeLandmarkPoints) {
-      landmarkResults.add(Offset(
-        point[0] / inputSize * image.width,
-        point[1] / inputSize * image.height,
-      ));
-    }
+    // for (var point in leftEyeLandmarkPoints) {
+    //   landmarkResults.add(Offset(
+    //     point[0] / inputSize * image.width,
+    //     point[1] / inputSize * image.height,
+    //   ));
+    // }
 
     return {'point': landmarkResults};
   }
