@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as image_lib;
@@ -36,8 +37,21 @@ class FaceMesh extends AiModel {
 
       final outputTensors = interpreter!.getOutputTensors();
 
-      print('ㅇㅇ: ${outputTensors}');
-      print('ㅇㅇ: ${outputTensors.length}');
+      print('호: ${outputTensors[1].numDimensions()}');
+      print('호: ${outputTensors[1].numElements()}');
+
+      // for (int i = 0; i < 7; i++) {
+      //   print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
+      // }
+      // for (int i = 0; i < 2; i++) {
+      //   print(
+      //       '${outputTensors[i + 4].name} - $i: ${outputTensors[i + 4].data}');
+      // }
+      var list = outputTensors[0].data;
+      Uint8List bytes = Uint8List.fromList(list);
+      String string = String.fromCharCodes(bytes);
+      // print('유닛: [${string}]]]');
+      // print('ㅇㅇ: ${outputTensors.length}');
 
       outputTensors.forEach((tensor) {
         outputShapes.add(tensor.shape);
@@ -74,31 +88,54 @@ class FaceMesh extends AiModel {
     tensorImage.loadImage(image);
     final inputImage = getProcessedImage(tensorImage);
 
-    TensorBuffer outputLandmarks = TensorBufferFloat(outputShapes[0]);
-    TensorBuffer outputScores = TensorBufferFloat(outputShapes[1]);
+    TensorBuffer output0 = TensorBufferFloat(outputShapes[0]);
+    TensorBuffer output1 = TensorBufferFloat(outputShapes[1]);
+    TensorBuffer output2 = TensorBufferFloat(outputShapes[2]);
+    TensorBuffer output3 = TensorBufferFloat(outputShapes[3]);
+    TensorBuffer output4 = TensorBufferFloat(outputShapes[4]);
+    TensorBuffer output5 = TensorBufferFloat(outputShapes[5]);
+    TensorBuffer output6 = TensorBufferFloat(outputShapes[6]);
 
     final inputs = <Object>[inputImage.buffer];
 
     final outputs = <int, Object>{
-      0: outputLandmarks.buffer,
-      1: outputScores.buffer,
+      0: output0.buffer,
+      1: output1.buffer,
+      2: output2.buffer,
+      3: output3.buffer,
+      4: output4.buffer,
+      5: output5.buffer,
+      6: output6.buffer,
     };
 
-    print('ss: ${outputs}');
-    print('ss: ${outputs.length}');
-    print('ss: ${outputs[0]}');
-    print('ss: ${outputs[1]}');
+    // print('ss: ${outputs}');
+    // print('ss: ${outputs.length}');
 
     interpreter!.runForMultipleInputs(inputs, outputs);
 
-    print('##########');
-    if (outputScores.getDoubleValue(0) < 0) {
+    // print('##########');
+    if (output1.getDoubleValue(0) < 0) {
       return null;
     }
 
-    final landmarkPoints = outputLandmarks.getDoubleList().reshape([468, 3]);
+    final lipsLandmarkPoints = output1.getDoubleList().reshape([80, 2]);
+    final leftEyeLandmarkPoints = output2.getDoubleList().reshape([71, 2]);
+
     final landmarkResults = <Offset>[];
-    for (var point in landmarkPoints) {
+    // var p = landmarkPoints[10];
+    // print('포인트 : [${p}]');
+    // landmarkResults.add(Offset(
+    //   p[0] / inputSize * image.width,
+    //   p[1] / inputSize * image.height,
+    // ));
+
+    for (var point in lipsLandmarkPoints) {
+      landmarkResults.add(Offset(
+        point[0] / inputSize * image.width,
+        point[1] / inputSize * image.height,
+      ));
+    }
+    for (var point in leftEyeLandmarkPoints) {
       landmarkResults.add(Offset(
         point[0] / inputSize * image.width,
         point[1] / inputSize * image.height,
