@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
-import 'pages/home/home_page.dart';
+import 'app/routes/app_pages.dart';
 import 'services/service_locator.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        builder: (BuildContext context, _) => MaterialApp(
+        builder: (BuildContext context, _) => GetMaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'Flutter with Mediapipe',
               theme: ThemeData(
@@ -23,7 +24,8 @@ class MyApp extends StatelessWidget {
                   color: Colors.transparent,
                 ),
               ),
-              home: const HomePage(),
+              initialRoute: Routes.HOME,
+              getPages: AppPages.routes,
             ));
   }
 }
