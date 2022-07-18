@@ -40,9 +40,9 @@ class FaceMesh extends AiModel {
       // print('호: ${outputTensors[1].numDimensions()}');
       // print('호: ${outputTensors[1].numElements()}');
 
-      for (int i = 0; i < 7; i++) {
-        print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
-      }
+      // for (int i = 0; i < 7; i++) {
+      //   print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
+      // }
       // for (int i = 0; i < 2; i++) {
       //   print(
       //       '${outputTensors[i + 4].name} - $i: ${outputTensors[i + 4].data}');

@@ -4,7 +4,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../constants/data.dart';
 import '../../services/model_inference_service.dart';
 import '../../services/service_locator.dart';
 import '../../utils/isolate_utils.dart';
@@ -12,7 +11,7 @@ import 'widget/model_camera_preview.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({
-    required this.index,
+    this.index = 1,
     Key? key,
   }) : super(key: key);
 
@@ -124,7 +123,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   AppBar get _buildAppBar => AppBar(
         title: Text(
-          models[widget.index]['title']!,
+          // models[widget.index]['title']!,
+          "개구량 측정하기",
           style: TextStyle(
               color: Colors.white,
               fontSize: ScreenUtil().setSp(28),
