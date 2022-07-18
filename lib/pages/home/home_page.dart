@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
         ),
         body: Center(
           child: ElevatedButton(
-            child: const Text('개구량 측정하기'),
+            child: const Text('개구량 촬영하기'),
             onPressed: () => _onTapCamera(context),
           ),
         ));
