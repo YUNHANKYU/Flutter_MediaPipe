@@ -3,8 +3,9 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_tflite_flutter/controllers/face_mesh_controller.dart';
+import 'package:get/get.dart';
 
-import '../../constants/data.dart';
 import '../../services/model_inference_service.dart';
 import '../../services/service_locator.dart';
 import '../../utils/isolate_utils.dart';
@@ -12,7 +13,7 @@ import 'widget/model_camera_preview.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({
-    required this.index,
+    this.index = 1,
     Key? key,
   }) : super(key: key);
 
@@ -104,12 +105,23 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        _imageStreamToggle;
+        // _imageStreamToggle;
+        if (_draw) {
+          setState(() {
+            _draw = false;
+          });
+        }
+        if (_isRun) {
+          _isRun = false;
+          _cameraController!.stopImageStream();
+        }
         Navigator.pop(context);
         return false;
       },
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: _modelInferenceService.inferenceResults == null
+            ? Colors.black
+            : Colors.green,
         appBar: _buildAppBar,
         body: ModelCameraPreview(
           cameraController: _cameraController,
@@ -124,7 +136,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   AppBar get _buildAppBar => AppBar(
         title: Text(
-          models[widget.index]['title']!,
+          // models[widget.index]['title']!,
+          "개구량 촬영하기",
           style: TextStyle(
               color: Colors.white,
               fontSize: ScreenUtil().setSp(28),
@@ -165,6 +178,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         (CameraImage cameraImage) async =>
             await _inference(cameraImage: cameraImage),
       );
+      // 사진을 스트림이 아니게 가져올 수 있는지 확인하던중이었음
     } else {
       _cameraController!.stopImageStream();
     }

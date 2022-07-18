@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as image_lib;
@@ -40,9 +39,9 @@ class FaceMesh extends AiModel {
       // print('호: ${outputTensors[1].numDimensions()}');
       // print('호: ${outputTensors[1].numElements()}');
 
-      for (int i = 0; i < 7; i++) {
-        print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
-      }
+      // for (int i = 0; i < 7; i++) {
+      //   print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
+      // }
       // for (int i = 0; i < 2; i++) {
       //   print(
       //       '${outputTensors[i + 4].name} - $i: ${outputTensors[i + 4].data}');
@@ -114,30 +113,65 @@ class FaceMesh extends AiModel {
       return null;
     }
 
-    if (outputDatas[6][3] < 65 || outputDatas[6][3] > 66) {
+    //
+    // outputDatas[6] : 7개 중에 7번째 face flag 에 해당하는 데이터 [0,0,0,0]
+    // outputDatas[6][3] : 위 데이터의 마지막 값. 현재 face probability threshold 로 추정
+    // print('Threshold: ${outputDatas[6][3]}');
+    if (outputDatas[6][3] < 65 || outputDatas[6][3] > 67) {
       return null;
     }
 
-    print('ㅇㅇㅇㅇ: ${outputDatas[6][3]}');
-
+    //
+    // output을 좌표 값으로 변환하는 과정
+    // 링크 참고: https://drive.google.com/file/d/1tV7EJb3XgMS7FwOErTgLU1ZocYyNmwlf/preview
+    // final allLandmarkPoints = output0.getDoubleList().reshape([468, 3]);
     final lipsLandmarkPoints = output1.getDoubleList().reshape([80, 2]);
-    // final leftEyeLandmarkPoints = output6.getDoubleList().reshape([20, 2]);
+    final leftEyeLandmarkPoints = output2.getDoubleList().reshape([71, 2]);
+    final rightEyeLandmarkPoints = output3.getDoubleList().reshape([71, 2]);
+    // final leftIrisLandmarkPoints = output4.getDoubleList().reshape([5, 2]);
+    // final rightIrisLandmarkPoints = output5.getDoubleList().reshape([5, 2]);
 
     final landmarkResults = <Offset>[];
 
+    // for (var point in allLandmarkPoints) {
+    //   landmarkResults.add(Offset(
+    //     point[0] / inputSize * image.width,
+    //     point[1] / inputSize * image.height,
+    //   ));
+    // }
     for (var point in lipsLandmarkPoints) {
       landmarkResults.add(Offset(
         point[0] / inputSize * image.width,
         point[1] / inputSize * image.height,
       ));
     }
-
-    // for (var point in leftEyeLandmarkPoints) {
+    for (var point in leftEyeLandmarkPoints) {
+      landmarkResults.add(Offset(
+        point[0] / inputSize * image.width,
+        point[1] / inputSize * image.height,
+      ));
+    }
+    for (var point in rightEyeLandmarkPoints) {
+      landmarkResults.add(Offset(
+        point[0] / inputSize * image.width,
+        point[1] / inputSize * image.height,
+      ));
+    }
+    // for (var point in leftIrisLandmarkPoints) {
     //   landmarkResults.add(Offset(
     //     point[0] / inputSize * image.width,
     //     point[1] / inputSize * image.height,
     //   ));
     // }
+    // for (var point in rightIrisLandmarkPoints) {
+    //   landmarkResults.add(Offset(
+    //     point[0] / inputSize * image.width,
+    //     point[1] / inputSize * image.height,
+    //   ));
+    // }
+
+    // print(
+    //     'inputSize: ${inputSize}, height: ${image.height}, width: ${image.width}');
 
     return {'point': landmarkResults};
   }
