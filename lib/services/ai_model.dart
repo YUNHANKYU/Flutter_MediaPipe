@@ -1,26 +1,26 @@
-import 'dart:typed_data';
+// import 'dart:typed_data';
 
-import 'package:equatable/equatable.dart';
-import 'package:image/image.dart' as image_lib;
-import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
+// import 'package:equatable/equatable.dart';
+// import 'package:image/image.dart' as image_lib;
+// import 'package:tflite_flutter/tflite_flutter.dart';
+// import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
-// ignore: must_be_immutable
-abstract class AiModel extends Equatable {
-  AiModel({this.interpreter});
+// // ignore: must_be_immutable
+// abstract class AiModel extends Equatable {
+//   AiModel({this.interpreter});
 
-  final outputShapes = <List<int>>[];
-  final outputTypes = <TfLiteType>[];
-  final outputDatas = <Uint8List>[];
+//   final outputShapes = <List<int>>[];
+//   final outputTypes = <TfLiteType>[];
+//   final outputDatas = <Uint8List>[];
 
-  Interpreter? interpreter;
+//   Interpreter? interpreter;
 
-  @override
-  List<Object> get props => [];
+//   @override
+//   List<Object> get props => [];
 
-  int get getAddress;
+//   int get getAddress;
 
-  Future<void> loadModel();
-  TensorImage getProcessedImage(TensorImage inputImage);
-  Map<String, dynamic>? predict(image_lib.Image image);
-}
+//   Future<void> loadModel();
+//   TensorImage getProcessedImage(TensorImage inputImage);
+//   Map<String, dynamic>? predict(image_lib.Image image);
+// }

@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onTapCamera(BuildContext context) {
     //TODO: index 넣던 부분 제거하기
-    locator<ModelInferenceService>().setModelConfig(1);
+    locator<ModelInferenceService>().setModelConfig();
     Get.toNamed(Routes.CAMERA);
   }
 }

@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_tflite_flutter/controllers/face_mesh_controller.dart';
 import 'package:get/get.dart';
 
 import '../../services/model_inference_service.dart';
@@ -30,16 +29,16 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   bool _isRun = false;
   bool _predicting = false;
-  bool _draw = false;
+  bool _draw = true;
 
   late IsolateUtils _isolateUtils;
   late ModelInferenceService _modelInferenceService;
-
-  final _faceMeshController = Get.find<FaceMeshController>();
+  late Map<String, dynamic> _modelResult;
 
   @override
   void initState() {
     _modelInferenceService = locator<ModelInferenceService>();
+    _modelResult = _modelInferenceService.inferenceResults!;
     _initStateAsync();
     super.initState();
   }
@@ -170,7 +169,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   void _imageStreamToggle() {
     setState(() {
-      _draw = !_draw;
+      // _draw = !_draw;
     });
 
     _isRun = !_isRun;
@@ -186,7 +185,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
       // TODO: 촬영하기 버튼 클릭 시 최종 길이 정보 확인하기
       print(
-          '길이: ${_faceMeshController.eyeSize} || 입술: ${_faceMeshController.lipSize} || 비율: ${_faceMeshController.ratio}');
+          '길이: ${_modelResult["eyeSize"]} || 입술: ${_modelResult["lipSize"]} || 비율: ${_modelResult["ratio"]}');
     }
   }
 
@@ -206,7 +205,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   Future<void> _inference({required CameraImage cameraImage}) async {
     if (!mounted) return;
 
-    if (_modelInferenceService.model.interpreter != null) {
+    if (_modelInferenceService.faceMesh.interpreter != null) {
       if (_predicting || !_draw) {
         return;
       }
