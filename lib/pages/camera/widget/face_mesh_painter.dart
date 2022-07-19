@@ -1,14 +1,17 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_tflite_flutter/controllers/face_mesh_controller.dart';
 
 class FaceMeshPainter extends CustomPainter {
   final List<Offset> points;
   final double ratio;
+  final FaceMeshController faceMeshController;
 
   FaceMeshPainter({
     required this.points,
     required this.ratio,
+    required this.faceMeshController,
   });
 
   @override
@@ -17,7 +20,6 @@ class FaceMeshPainter extends CustomPainter {
       var paint1 = Paint()
         ..color = Colors.amber
         ..strokeWidth = 4;
-
       var paint2 = Paint()
         ..color = Colors.red
         ..strokeWidth = 4;
@@ -37,7 +39,10 @@ class FaceMeshPainter extends CustomPainter {
       // print('최소: ${greenPoints[0]}');
       var eyeSize = (greenPoints[1] - greenPoints[0]).distance;
       var lipSize = (bluePoints[1] - bluePoints[0]).distance;
-      print('길이: $eyeSize || 입술: $lipSize || 비율: ${lipSize / eyeSize}');
+      // print('길이: $eyeSize || 입술: $lipSize || 비율: ${lipSize / eyeSize}');
+
+      // controller에 지속적으로 업데이트 하는 함수
+      faceMeshController.updateResult(eyeSize, lipSize, lipSize / eyeSize);
 
       canvas.drawPoints(PointMode.points,
           yellowPoints.map((point) => point * ratio).toList(), paint1);

@@ -28,12 +28,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   late List<CameraDescription> _cameras;
   late CameraDescription _cameraDescription;
 
-  late bool _isRun;
+  bool _isRun = false;
   bool _predicting = false;
   bool _draw = false;
 
   late IsolateUtils _isolateUtils;
   late ModelInferenceService _modelInferenceService;
+
+  final _faceMeshController = Get.find<FaceMeshController>();
 
   @override
   void initState() {
@@ -83,6 +85,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     try {
       await _cameraController!.initialize().then((value) {
         if (!mounted) return;
+        _imageStreamToggle();
       });
     } on CameraException catch (e) {
       _showInSnackBar('Error: ${e.code}\n${e.description}');
@@ -119,9 +122,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         return false;
       },
       child: Scaffold(
-        backgroundColor: _modelInferenceService.inferenceResults == null
-            ? Colors.black
-            : Colors.green,
+        backgroundColor:
+            _isRun && _modelInferenceService.inferenceResults != null
+                ? Colors.green
+                : Colors.black,
         appBar: _buildAppBar,
         body: ModelCameraPreview(
           cameraController: _cameraController,
@@ -145,29 +149,26 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         ),
       );
 
-  Row get _buildFloatingActionButton => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(
-            onPressed: () => _cameraDirectionToggle,
-            color: Colors.white,
-            iconSize: ScreenUtil().setWidth(30.0),
-            icon: const Icon(
-              Icons.cameraswitch,
+  Widget get _buildFloatingActionButton => InkWell(
+        onTap: _imageStreamToggle,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.08,
+          color: Colors.blue,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              '촬영하기',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w400),
             ),
           ),
-          IconButton(
-            onPressed: () => _imageStreamToggle,
-            color: Colors.white,
-            iconSize: ScreenUtil().setWidth(30.0),
-            icon: const Icon(
-              Icons.filter_center_focus,
-            ),
-          ),
-        ],
+        ),
       );
 
-  void get _imageStreamToggle {
+  void _imageStreamToggle() {
     setState(() {
       _draw = !_draw;
     });
@@ -178,9 +179,12 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         (CameraImage cameraImage) async =>
             await _inference(cameraImage: cameraImage),
       );
-      // 사진을 스트림이 아니게 가져올 수 있는지 확인하던중이었음
     } else {
       _cameraController!.stopImageStream();
+
+      // TODO: 촬영하기 버튼 클릭 시 최종 길이 정보 확인하기
+      print(
+          '길이: ${_faceMeshController.eyeSize} || 입술: ${_faceMeshController.lipSize} || 비율: ${_faceMeshController.ratio}');
     }
   }
 

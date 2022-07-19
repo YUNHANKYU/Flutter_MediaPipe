@@ -1,12 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tflite_flutter/controllers/face_mesh_controller.dart';
+import 'package:get/get.dart';
 
 import '../../../services/model_inference_service.dart';
 import '../../../services/service_locator.dart';
-import 'face_detection_painter.dart';
 import 'face_mesh_painter.dart';
-import 'hands_painter.dart';
-import 'pose_painter.dart';
 
 class ModelCameraPreview extends StatelessWidget {
   ModelCameraPreview({
@@ -23,6 +22,8 @@ class ModelCameraPreview extends StatelessWidget {
   late final double _ratio;
   final Map<String, dynamic>? inferenceResults =
       locator<ModelInferenceService>().inferenceResults;
+
+  final _faceMeshController = Get.find<FaceMeshController>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,27 +44,9 @@ class ModelCameraPreview extends StatelessWidget {
         CameraPreview(cameraController!),
         Visibility(
           visible: draw,
-          child: IndexedStack(
-            index: index,
-            children: [
-              _drawBoundingBox,
-              _drawLandmarks,
-              // _drawHands,
-              // _drawPose,
-            ],
-          ),
+          child: _drawLandmarks,
         ),
       ],
-    );
-  }
-
-  Widget get _drawBoundingBox {
-    final bbox = inferenceResults?['bbox'];
-    return _ModelPainter(
-      customPainter: FaceDetectionPainter(
-        bbox: bbox ?? Rect.zero,
-        ratio: _ratio,
-      ),
     );
   }
 
@@ -71,20 +54,7 @@ class ModelCameraPreview extends StatelessWidget {
         customPainter: FaceMeshPainter(
           points: inferenceResults?['point'] ?? [],
           ratio: _ratio,
-        ),
-      );
-
-  Widget get _drawHands => _ModelPainter(
-        customPainter: HandsPainter(
-          points: inferenceResults?['point'] ?? [],
-          ratio: _ratio,
-        ),
-      );
-
-  Widget get _drawPose => _ModelPainter(
-        customPainter: PosePainter(
-          points: inferenceResults?['point'] ?? [],
-          ratio: _ratio,
+          faceMeshController: _faceMeshController,
         ),
       );
 }
