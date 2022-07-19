@@ -18,7 +18,7 @@ enum Models {
 }
 
 class ModelInferenceService {
-  late AiModel model;
+  late FaceMesh faceMesh;
   late Function handler;
   Map<String, dynamic>? inferenceResults;
 
@@ -32,7 +32,7 @@ class ModelInferenceService {
       handler: handler,
       params: {
         'cameraImage': cameraImage,
-        'detectorAddress': model.getAddress,
+        'detectorAddress': faceMesh.getAddress,
       },
       sendPort: isolateUtils.sendPort,
       responsePort: responsePort,
@@ -42,24 +42,8 @@ class ModelInferenceService {
     responsePort.close();
   }
 
-  void setModelConfig(int index) {
-    switch (Models.values[index]) {
-      case Models.FaceDetection:
-        // model = locator<FaceDetection>();
-        // handler = runFaceDetector;
-        break;
-      case Models.FaceMesh:
-        model = locator<FaceMesh>();
-        handler = runFaceMesh;
-        break;
-      case Models.Hands:
-        // model = locator<Hands>();
-        // handler = runHandDetector;
-        break;
-      case Models.Pose:
-        // model = locator<Pose>();
-        // handler = runPoseEstimator;
-        break;
-    }
+  void setModelConfig() {
+    faceMesh = locator<FaceMesh>();
+    handler = runFaceMesh;
   }
 }

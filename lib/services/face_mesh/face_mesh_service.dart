@@ -1,32 +1,33 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image/image.dart' as image_lib;
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
 
 import '../../constants/model_file.dart';
 import '../../utils/image_utils.dart';
-import '../ai_model.dart';
 
 // ignore: must_be_immutable
-class FaceMesh extends AiModel {
+class FaceMesh {
   FaceMesh({this.interpreter}) {
     loadModel();
   }
 
-  final int inputSize = 192;
+  final outputShapes = <List<int>>[];
+  final outputTypes = <TfLiteType>[];
+  final outputDatas = <Uint8List>[];
 
-  @override
   Interpreter? interpreter;
 
-  @override
+  final int inputSize = 192;
+
   List<Object> get props => [];
 
-  @override
   int get getAddress => interpreter!.address;
 
-  @override
   Future<void> loadModel() async {
     try {
       final interpreterOptions = InterpreterOptions();
@@ -35,18 +36,6 @@ class FaceMesh extends AiModel {
           options: interpreterOptions);
 
       final outputTensors = interpreter!.getOutputTensors();
-
-      // print('호: ${outputTensors[1].numDimensions()}');
-      // print('호: ${outputTensors[1].numElements()}');
-
-      // for (int i = 0; i < 7; i++) {
-      //   print('${outputTensors[i].name} - $i: ${outputTensors[i].data.length}');
-      // }
-      // for (int i = 0; i < 2; i++) {
-      //   print(
-      //       '${outputTensors[i + 4].name} - $i: ${outputTensors[i + 4].data}');
-      // }
-      // print('ㅇㅇ: ${outputTensors[6].data}');
 
       outputTensors.forEach((tensor) {
         outputShapes.add(tensor.shape);
@@ -58,7 +47,6 @@ class FaceMesh extends AiModel {
     }
   }
 
-  @override
   TensorImage getProcessedImage(TensorImage inputImage) {
     final imageProcessor = ImageProcessorBuilder()
         .add(ResizeOp(inputSize, inputSize, ResizeMethod.BILINEAR))
@@ -69,7 +57,6 @@ class FaceMesh extends AiModel {
     return inputImage;
   }
 
-  @override
   Map<String, dynamic>? predict(image_lib.Image image) {
     if (interpreter == null) {
       print('Interpreter not initialized');
@@ -104,41 +91,22 @@ class FaceMesh extends AiModel {
       6: output6.buffer,
     };
 
-    // print('ss: ${outputs[6].toString()}');
-    // print('ss: ${outputs.length}');
-
     interpreter!.runForMultipleInputs(inputs, outputs);
 
     if (output1.getDoubleValue(0) < 0) {
       return null;
     }
 
-    //
-    // outputDatas[6] : 7개 중에 7번째 face flag 에 해당하는 데이터 [0,0,0,0]
-    // outputDatas[6][3] : 위 데이터의 마지막 값. 현재 face probability threshold 로 추정
-    // print('Threshold: ${outputDatas[6][3]}');
     if (outputDatas[6][3] < 65 || outputDatas[6][3] > 67) {
       return null;
     }
 
-    //
-    // output을 좌표 값으로 변환하는 과정
-    // 링크 참고: https://drive.google.com/file/d/1tV7EJb3XgMS7FwOErTgLU1ZocYyNmwlf/preview
-    // final allLandmarkPoints = output0.getDoubleList().reshape([468, 3]);
     final lipsLandmarkPoints = output1.getDoubleList().reshape([80, 2]);
     final leftEyeLandmarkPoints = output2.getDoubleList().reshape([71, 2]);
     final rightEyeLandmarkPoints = output3.getDoubleList().reshape([71, 2]);
-    // final leftIrisLandmarkPoints = output4.getDoubleList().reshape([5, 2]);
-    // final rightIrisLandmarkPoints = output5.getDoubleList().reshape([5, 2]);
 
     final landmarkResults = <Offset>[];
 
-    // for (var point in allLandmarkPoints) {
-    //   landmarkResults.add(Offset(
-    //     point[0] / inputSize * image.width,
-    //     point[1] / inputSize * image.height,
-    //   ));
-    // }
     for (var point in lipsLandmarkPoints) {
       landmarkResults.add(Offset(
         point[0] / inputSize * image.width,
@@ -157,23 +125,23 @@ class FaceMesh extends AiModel {
         point[1] / inputSize * image.height,
       ));
     }
-    // for (var point in leftIrisLandmarkPoints) {
-    //   landmarkResults.add(Offset(
-    //     point[0] / inputSize * image.width,
-    //     point[1] / inputSize * image.height,
-    //   ));
-    // }
-    // for (var point in rightIrisLandmarkPoints) {
-    //   landmarkResults.add(Offset(
-    //     point[0] / inputSize * image.width,
-    //     point[1] / inputSize * image.height,
-    //   ));
-    // }
 
-    // print(
-    //     'inputSize: ${inputSize}, height: ${image.height}, width: ${image.width}');
+    var bluePoints = [landmarkResults[5], landmarkResults[15]];
+    var greenPoints = [landmarkResults[134], landmarkResults[205]];
 
-    return {'point': landmarkResults};
+    // print('최대: ${greenPoints[1]}');
+    // print('최소: ${greenPoints[0]}');
+    var eyeSize = (greenPoints[1] - greenPoints[0]).distance;
+    var lipSize = (bluePoints[1] - bluePoints[0]).distance;
+
+    print('길이: ${eyeSize} || 입술: ${lipSize} || 비율: ${lipSize / eyeSize}');
+
+    return {
+      'point': landmarkResults,
+      'eyeSize': eyeSize,
+      'lipSize': lipSize,
+      'ratio': lipSize / eyeSize
+    };
   }
 }
 

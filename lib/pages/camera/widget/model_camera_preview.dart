@@ -1,6 +1,5 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tflite_flutter/controllers/face_mesh_controller.dart';
 import 'package:get/get.dart';
 
 import '../../../services/model_inference_service.dart';
@@ -23,7 +22,6 @@ class ModelCameraPreview extends StatelessWidget {
   final Map<String, dynamic>? inferenceResults =
       locator<ModelInferenceService>().inferenceResults;
 
-  final _faceMeshController = Get.find<FaceMeshController>();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +52,6 @@ class ModelCameraPreview extends StatelessWidget {
         customPainter: FaceMeshPainter(
           points: inferenceResults?['point'] ?? [],
           ratio: _ratio,
-          faceMeshController: _faceMeshController,
         ),
       );
 }
