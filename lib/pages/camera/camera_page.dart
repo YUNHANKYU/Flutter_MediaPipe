@@ -179,8 +179,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         (CameraImage cameraImage) async =>
             await _inference(cameraImage: cameraImage),
       );
+      _cameraController!.resumePreview();
     } else {
       _cameraController!.stopImageStream();
+      _cameraController!.pausePreview();
 
       // TODO: 촬영하기 버튼 클릭 시 최종 길이 정보 확인하기
       print(
