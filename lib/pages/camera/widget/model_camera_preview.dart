@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../services/model_inference_service.dart';
 import '../../../services/service_locator.dart';
-import 'face_detection_painter.dart';
 import 'face_mesh_painter.dart';
 
 class ModelCameraPreview extends StatelessWidget {
@@ -41,27 +40,9 @@ class ModelCameraPreview extends StatelessWidget {
         CameraPreview(cameraController!),
         Visibility(
           visible: draw,
-          child: IndexedStack(
-            index: index,
-            children: [
-              _drawBoundingBox,
-              _drawLandmarks,
-              // _drawHands,
-              // _drawPose,
-            ],
-          ),
+          child: _drawLandmarks,
         ),
       ],
-    );
-  }
-
-  Widget get _drawBoundingBox {
-    final bbox = inferenceResults?['bbox'];
-    return _ModelPainter(
-      customPainter: FaceDetectionPainter(
-        bbox: bbox ?? Rect.zero,
-        ratio: _ratio,
-      ),
     );
   }
 
