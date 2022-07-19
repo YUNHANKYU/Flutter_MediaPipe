@@ -5,8 +5,6 @@ import '../../../services/model_inference_service.dart';
 import '../../../services/service_locator.dart';
 import 'face_detection_painter.dart';
 import 'face_mesh_painter.dart';
-import 'hands_painter.dart';
-import 'pose_painter.dart';
 
 class ModelCameraPreview extends StatelessWidget {
   ModelCameraPreview({
@@ -69,20 +67,6 @@ class ModelCameraPreview extends StatelessWidget {
 
   Widget get _drawLandmarks => _ModelPainter(
         customPainter: FaceMeshPainter(
-          points: inferenceResults?['point'] ?? [],
-          ratio: _ratio,
-        ),
-      );
-
-  Widget get _drawHands => _ModelPainter(
-        customPainter: HandsPainter(
-          points: inferenceResults?['point'] ?? [],
-          ratio: _ratio,
-        ),
-      );
-
-  Widget get _drawPose => _ModelPainter(
-        customPainter: PosePainter(
           points: inferenceResults?['point'] ?? [],
           ratio: _ratio,
         ),

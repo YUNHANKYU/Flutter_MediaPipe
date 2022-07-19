@@ -178,7 +178,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         (CameraImage cameraImage) async =>
             await _inference(cameraImage: cameraImage),
       );
-      // 사진을 스트림이 아니게 가져올 수 있는지 확인하던중이었음
     } else {
       _cameraController!.stopImageStream();
     }
