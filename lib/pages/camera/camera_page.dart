@@ -28,7 +28,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   late List<CameraDescription> _cameras;
   late CameraDescription _cameraDescription;
 
-  late bool _isRun;
+  bool _isRun = false;
   bool _predicting = false;
   bool _draw = false;
 
@@ -119,9 +119,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         return false;
       },
       child: Scaffold(
-        backgroundColor: _modelInferenceService.inferenceResults == null
-            ? Colors.black
-            : Colors.green,
+        backgroundColor:
+            _isRun && _modelInferenceService.inferenceResults != null
+                ? Colors.green
+                : Colors.black,
         appBar: _buildAppBar,
         body: ModelCameraPreview(
           cameraController: _cameraController,
