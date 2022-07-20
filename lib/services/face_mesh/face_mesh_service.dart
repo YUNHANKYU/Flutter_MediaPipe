@@ -134,7 +134,7 @@ class FaceMesh {
     var eyeSize = (greenPoints[1] - greenPoints[0]).distance;
     var lipSize = (bluePoints[1] - bluePoints[0]).distance;
 
-    print('길이: ${eyeSize} || 입술: ${lipSize} || 비율: ${lipSize / eyeSize}');
+    // print('길이: ${eyeSize} || 입술: ${lipSize} || 비율: ${lipSize / eyeSize}');
 
     return {
       'point': landmarkResults,

@@ -38,7 +38,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   @override
   void initState() {
     _modelInferenceService = locator<ModelInferenceService>();
-    _modelResult = _modelInferenceService.inferenceResults!;
     _initStateAsync();
     super.initState();
   }
@@ -185,7 +184,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
       // TODO: 촬영하기 버튼 클릭 시 최종 길이 정보 확인하기
       print(
-          '길이: ${_modelResult["eyeSize"]} || 입술: ${_modelResult["lipSize"]} || 비율: ${_modelResult["ratio"]}');
+          '22길이: ${_modelResult["eyeSize"]} || 입술: ${_modelResult["lipSize"]} || 비율: ${_modelResult["ratio"]}');
     }
   }
 
@@ -219,6 +218,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           isolateUtils: _isolateUtils,
           cameraImage: cameraImage,
         );
+        _modelResult = _modelInferenceService.inferenceResults ?? {};
       }
 
       setState(() {
